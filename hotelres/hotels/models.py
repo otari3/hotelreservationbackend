@@ -27,7 +27,7 @@ class Hotels(models.Model):
       
   @staticmethod
   def get_hotel(id):
-    query = """ SELECT * FROM hotels_hotels 
+    query = """ SELECT name,address FROM hotels_hotels 
                 WHERE id = %s;"""
     try:
       return base_model.Data_base_handeler.select_one(query,(id,))
@@ -37,7 +37,7 @@ class Hotels(models.Model):
       raise
   @staticmethod
   def login(user):
-    query = """ SELECT email,password FROM hotels_hotels
+    query = """ SELECT email,password,id FROM hotels_hotels
                 WHERE email = %s
                 """
     with transaction.atomic():
@@ -47,14 +47,14 @@ class Hotels(models.Model):
           auth_user = cursor.fetchone()
           if auth_user:
             if check_password(user['password'],auth_user[1]):
-              encoded_jwt = jwt.encode({'email':auth_user[0],'password':auth_user[1]},settings.JWT_SECRET_KEY,algorithm="HS256")
+              encoded_jwt = jwt.encode({'hotel_id':str(auth_user[2])},settings.JWT_SECRET_KEY,algorithm="HS256")
               return encoded_jwt
             else:
               raise
           else:
             raise
-        except:
-          raise Exception('Wrong login Inforamtion')
+        except Exception as e :
+          raise Exception(f'Wrong login Inforamtion {e}')
               
     
     

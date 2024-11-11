@@ -9,8 +9,6 @@ from shared import erros
 @csrf_exempt
 def insert_in_hotel(request):
   if request.method == 'POST':
-    auth = request.headers.get('Authorization')
-    print(auth)
     try:
       data = json.loads(request.body)
       email = data['email']
@@ -28,10 +26,11 @@ def insert_in_hotel(request):
   else:
     return JsonResponse({'error':'httpmethod need to be post'},status=405)
   
-def get_hotel(request,id):
+def get_hotel(request):
   if request.method =='GET':
     try:
-      hotel = Hotels.get_hotel(int(id))
+      hotel_id = getattr(request,'hotel_id',None)
+      hotel = Hotels.get_hotel(hotel_id['hotel_id'])
       return JsonResponse({'hotel':hotel[0]},status=200)
     except erros.DataBaseErrors.FormatingError as e:
       response = JsonResponse({'error':str(e),'from':'get_hotel'},status=400)
