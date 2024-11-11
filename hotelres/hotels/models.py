@@ -6,6 +6,7 @@ class Hotels(models.Model):
   name = models.TextField()
   address = models.TextField()
   database_handeler = base_model.Data_base_handeler
+  print('hello world')
   def register_hotel(self):
     query = """INSERT INTO hotels_hotels (name,address)
                VALUES (%s,%s);"""
