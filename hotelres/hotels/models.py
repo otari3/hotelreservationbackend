@@ -1,9 +1,13 @@
+import uuid
 from django.db import models
 from shared import models as base_model,erros
 
 # Create your models here.
 class Hotels(models.Model):
-  name = models.TextField()
+  id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+  email = models.TextField(unique =True)
+  password = models.TextField()
+  name = models.TextField(unique =True)
   address = models.TextField()
   database_handeler = base_model.Data_base_handeler
   print('hello world')
