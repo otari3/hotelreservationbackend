@@ -15,7 +15,6 @@ class LoginRequiredMiddleware(MiddlewareMixin):
           request.hotel_id = decoded_json_web_tobken
         except IndentationError as e:
             return JsonResponse({'error':f'there is not web token {e}'})
-            pass
         except AttributeError as e :
           return JsonResponse({'error':f'check your headers {e}'})
         except Exception as e:
