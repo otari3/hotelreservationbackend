@@ -34,3 +34,15 @@
   "nights":4,
 
 }
+{  
+    "email":"test@gmails.com", 
+    "password":"test1234",
+    "name":"testhotel2",
+    "address":"chavchavadze str 48"
+}
+{  
+    "email":"test@gmail.com", 
+    "password":"test123",
+    "name":"testhotel1",
+    "address":"chavchavadze str 48"
+}

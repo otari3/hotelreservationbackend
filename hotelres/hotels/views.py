@@ -9,16 +9,20 @@ from shared import erros
 @csrf_exempt
 def insert_in_hotel(request):
   if request.method == 'POST':
+    auth = request.headers.get('Authorization')
+    print(auth)
     try:
       data = json.loads(request.body)
+      email = data['email']
+      password = data['password']
       name = data['name']
       address = data['address']
-      hotel = Hotels(name=name,address=address)
+      hotel = Hotels(email=email,password=password,name=name,address=address)
       return JsonResponse(hotel.register_hotel(),status=200)
     except json.JSONDecodeError as e:
       return JsonResponse({'error':str(e),'from':'insert_in_hotel'},status=400)
     except erros.DataBaseErrors.ExecuteQuery as er:
-      return JsonResponse({'error':str(er),'from':'insert_in_hotel'},status=400)
+      return JsonResponse({'error':str(er),'from':'insert_in_hotel'},status=401)
     except Exception as error:
       return JsonResponse({'error':str(error),'from':'insert_in_hotel'},status=400)
   else:
@@ -36,7 +40,12 @@ def get_hotel(request,id):
       return JsonResponse({'error':str(seler),'from':'get_hotel'},status=400)
     except Exception as error:
       return JsonResponse({'error':str(error),'from':'get_hotel'},status=400)
-      
   else:
     return JsonResponse({'eroor':'httpmethond need to be get'},status=405)
-      
+def login_user(request):
+  if request.method == 'GET':
+    try:
+      user = json.loads(request.body)
+      return JsonResponse({'token':Hotels.login(user)},status=200)      
+    except Exception as e:
+      return JsonResponse({'error':str(e)},status=401)

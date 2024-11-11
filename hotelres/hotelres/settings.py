@@ -118,6 +118,7 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+JWT_SECRET_KEY = 'your_secret_key_is_70%'
 
 
 # Static files (CSS, JavaScript, Images)
