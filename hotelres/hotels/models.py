@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from shared import models as base_model,erros
+import jwt
 
 # Create your models here.
 class Hotels(models.Model):
@@ -10,7 +11,6 @@ class Hotels(models.Model):
   name = models.TextField(unique =True)
   address = models.TextField()
   database_handeler = base_model.Data_base_handeler
-  print('hello world')
   def register_hotel(self):
     query = """INSERT INTO hotels_hotels (name,address)
                VALUES (%s,%s);"""
