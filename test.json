@@ -1,5 +1,4 @@
 {
-  "hotel_id":1,
   "rooms": [
     { "type": "premium", "price": 160, "room_number": 107 },
     { "type": "luxury", "price": 300, "room_number": 108 },
@@ -8,7 +7,7 @@
     {
       "type": "two bed rooms",
       "price": 120,
-      "room_number": 111,
+      "room_number": 111
     },
     { "type": "exlusev", "price": 140, "room_number": 112},
     { "type": "premium", "price": 300, "room_number": 113},
