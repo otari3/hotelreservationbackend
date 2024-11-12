@@ -17,5 +17,7 @@ class LoginRequiredMiddleware(MiddlewareMixin):
             return JsonResponse({'error':f'there is not web token {e}'})
         except AttributeError as e :
           return JsonResponse({'error':f'check your headers {e}'})
+        except jwt.InvalidTokenError:
+          return JsonResponse({'error':f'Invalid Token {e}'})
         except Exception as e:
           return JsonResponse({'error':f'jwt error {e}'})
