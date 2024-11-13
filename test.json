@@ -45,3 +45,15 @@
     "name":"testhotel1",
     "address":"chavchavadze str 48"
 }
+
+{ 
+  "name":"otonozadze",
+  "personal_id":"60001153180",
+  "check_in":"2024-01-01",
+  "check_out":"2024-01-03",
+  "price":150,
+  "nights":2,
+  "room_id":6,
+  
+
+}
