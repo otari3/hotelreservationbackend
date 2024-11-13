@@ -29,4 +29,14 @@ class Reservation(models.Model):
                                                self.hotel_id,self.room_id))
     except:
       raise
+  @staticmethod
+  def searchin_reservation_info():
+    query = """SELECT  
+               array_agg(r.id) AS reservation_ids,array_agg(rooms.room_number) AS rooms,sum(r.nights*r.price) AS total, 
+               r.check_in,r.check_out,u.personal_id,u.name
+               FROM reservation_reservation r  
+               INNER JOIN hotelrooms_hotelrooms rooms ON r.room_id = rooms.id  
+               INNER JOIN users_user u ON r.user_id = u.id
+               GROUP BY r.check_in,r.check_out,u.personal_id,u.name;
+"""
         
