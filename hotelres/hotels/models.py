@@ -9,7 +9,7 @@ from django.contrib.auth.hashers import make_password, check_password
 # Create your models here.
 class Hotels(models.Model):
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-  email = models.TextField(unique =True)
+  email = models.TextField(unique =True,null=False, blank=False)
   password = models.TextField()
   name = models.TextField(unique =True)
   address = models.TextField()

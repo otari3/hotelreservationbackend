@@ -1,9 +1,10 @@
-from django.db import models
+from django.db import models,connection,transaction
 from users.models import User
 from hotels.models import Hotels
 from hotelrooms.models import HotelRooms
 from shared import models as handeler
 import json
+
 
 # Create your models here.
 
@@ -17,7 +18,11 @@ class Reservation(models.Model):
   hotel = models.ForeignKey(Hotels,on_delete=models.CASCADE)
   room = models.ForeignKey(HotelRooms,on_delete=models.CASCADE)
   class Meta:
-    unique_together = ('check_in','check_out','hotel_id','room_id')
+    unique_together = ('check_in','check_out','hotel','room')
+    indexes = [
+        models.Index(fields=['check_in', 'check_out','user','hotel','room'])
+    ]
+
   def insert_reservation(self):
     query = """INSERT INTO reservation_reservation  
                (check_in,check_out,user_id,price,in_hotel,nights,hotel_id,room_id)
@@ -31,15 +36,27 @@ class Reservation(models.Model):
     except:
       raise
   @staticmethod
-  def searchin_reservation_info():
+  def searchin_reservation_info(where_query,haveing_query,hotel_id):
     query = """SELECT  
                array_agg(r.id) AS reservation_ids,array_agg(rooms.room_number) AS rooms,  
                sum(r.nights*r.price) AS total, r.check_in,r.check_out,u.personal_id,u.name
                FROM reservation_reservation r  
                INNER JOIN hotelrooms_hotelrooms rooms ON r.room_id = rooms.id  
                INNER JOIN users_user u ON r.user_id = u.id
-               GROUP BY r.check_in,r.check_out,u.personal_id,u.name;
-              """
+               WHERE r.hotel_id= '{}'{}
+               GROUP BY r.check_in,r.check_out,u.id
+               HAVING TRUE{}
+               ORDER BY u.id ASC
+               LIMIT 100;
+              """.format(hotel_id,where_query,haveing_query)
+    try:
+     with connection.cursor() as cursor:
+       cursor.execute(query)
+       data = cursor.fetchall()
+       desc = cursor.description
+       return handeler.Data_base_handeler.format_information(data,desc)
+    except  Exception as e:
+      raise
   @staticmethod   
   def get_avalible_rooms(hotel_id):
     query = """WITH reserved_dates_rooms AS (SELECT room_id, jsonb_build_object( 
@@ -62,7 +79,7 @@ class Reservation(models.Model):
     try:
       data = handeler.Data_base_handeler.select_all(query,(hotel_id,hotel_id))
       serilazed_data = [{"room_number":r['room_number'],  
-                                   "date":[json.loads(date) if date else None 
+                                   "dates":[json.loads(date) if date else None 
                                                             for date in r['dates']]}
                                                             for r in data]
       return serilazed_data
