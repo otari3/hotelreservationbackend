@@ -4,6 +4,7 @@ from hotels.models import Hotels
 from hotelrooms.models import HotelRooms
 from shared import models as handeler
 import json
+from psycopg2 import sql
 
 
 # Create your models here.
@@ -36,22 +37,25 @@ class Reservation(models.Model):
     except:
       raise
   @staticmethod
-  def searchin_reservation_info(where_query,haveing_query,hotel_id):
+  def searchin_reservation_info(where_query,haveing_query,hotel_id,params):
+    where_clause = sql.SQL("AND {}").format(sql.SQL(where_query)) if where_query else sql.SQL("")
+    haveing_clause = sql.SQL("AND {}").format(sql.SQL(haveing_query)) if haveing_query else sql.SQL("")
     query = """SELECT  
                array_agg(r.id) AS reservation_ids,array_agg(rooms.room_number) AS rooms,  
                sum(r.nights*r.price) AS total, r.check_in,r.check_out,u.personal_id,u.name
                FROM reservation_reservation r  
                INNER JOIN hotelrooms_hotelrooms rooms ON r.room_id = rooms.id  
                INNER JOIN users_user u ON r.user_id = u.id
-               WHERE r.hotel_id= '{}'{}
+               WHERE r.hotel_id= %s {where_clause}
                GROUP BY r.check_in,r.check_out,u.id
-               HAVING TRUE{}
+               HAVING TRUE {haveing_clause}
                ORDER BY u.id ASC
                LIMIT 100;
-              """.format(hotel_id,where_query,haveing_query)
+              """.format(where_clause=where_clause.as_string(connection),  
+                        haveing_clause=haveing_clause.as_string(connection))
     try:
      with connection.cursor() as cursor:
-       cursor.execute(query)
+       cursor.execute(query,[hotel_id,*params])
        data = cursor.fetchall()
        desc = cursor.description
        return handeler.Data_base_handeler.format_information(data,desc)
