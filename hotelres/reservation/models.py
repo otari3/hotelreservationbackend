@@ -40,17 +40,19 @@ class Reservation(models.Model):
   def searchin_reservation_info(where_query,haveing_query,hotel_id,params):
     where_clause = sql.SQL("AND {}").format(sql.SQL(where_query)) if where_query else sql.SQL("")
     haveing_clause = sql.SQL("AND {}").format(sql.SQL(haveing_query)) if haveing_query else sql.SQL("")
-    query = """SELECT  
-               array_agg(r.id) AS reservation_ids,array_agg(rooms.room_number) AS rooms,  
-               sum(r.nights*r.price) AS total, r.check_in,r.check_out,u.personal_id,u.name
-               FROM reservation_reservation r  
-               INNER JOIN hotelrooms_hotelrooms rooms ON r.room_id = rooms.id  
-               INNER JOIN users_user u ON r.user_id = u.id
-               WHERE r.hotel_id= %s {where_clause}
-               GROUP BY r.check_in,r.check_out,u.id
-               HAVING TRUE {haveing_clause}
-               ORDER BY u.id ASC
-               LIMIT 100;
+    query = """
+              WITH order_reservation as (SELECT  
+                      array_agg(r.id) AS reservation_ids,array_agg(rooms.room_number) AS rooms,  
+                      sum(r.nights*r.price) AS total, r.check_in,r.check_out,u.personal_id,u.name,
+                      ROW_NUMBER() OVER(ORDER BY r.check_in) as pagination_ids
+                      FROM reservation_reservation r  
+                      INNER JOIN hotelrooms_hotelrooms rooms ON r.room_id = rooms.id  
+                      INNER JOIN users_user u ON r.user_id = u.id
+                      WHERE r.hotel_id= %s {where_clause}
+                      GROUP BY r.check_in,r.check_out,u.id
+                      HAVING TRUE {haveing_clause})
+              SELECT * FROM order_reservation 
+              LIMIT 100;
               """.format(where_clause=where_clause.as_string(connection),  
                         haveing_clause=haveing_clause.as_string(connection))
     try:
@@ -89,5 +91,22 @@ class Reservation(models.Model):
       return serilazed_data
     except:
       raise
+  @staticmethod
+  def get_all_booked_dates(hotel_id):
+    query = """
+        WITH  table_expersion AS( 
+        SELECT room.room_number,generate_series( 
+          r.check_in::date,
+          r.check_out::date,
+          '1 day'::interval
+        )::date AS booked_dates
+        from reservation_reservation r 
+        INNER JOIN hotelrooms_hotelrooms room ON room.id = r.room_id 
+        WHERE r.hotel_id = %s
+        )
+        SELECT te.room_number,array_agg(te.booked_dates)
+        FROM table_expersion as te
+        GROUP BY te.room_number;
+    """
     
         
