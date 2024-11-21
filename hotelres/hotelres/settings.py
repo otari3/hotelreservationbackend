@@ -40,13 +40,16 @@ INSTALLED_APPS = [
     'hotels',
     'hotelrooms',
     'users',
-    'reservation'
+    'reservation',
+    'corsheaders',
     
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.common.CommonMiddleware',
     'authmiddle.middleware.LoginRequiredMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -56,6 +59,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'hotelres.urls'
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
 TEMPLATES = [
     {
