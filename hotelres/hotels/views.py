@@ -45,8 +45,9 @@ def get_hotel(request):
       return JsonResponse({'error':str(error),'from':'get_hotel'},status=400)
   else:
     return JsonResponse({'eroor':'httpmethond need to be get'},status=405)
+@csrf_exempt
 def login_user(request):
-  if request.method == 'GET':
+  if request.method == 'POST':
     try:
       user = json.loads(request.body)
       return JsonResponse({'token':Hotels.login(user)},status=200)      
