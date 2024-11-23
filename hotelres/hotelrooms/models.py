@@ -8,13 +8,14 @@ class HotelRooms(models.Model):
   type = models.TextField(max_length = 30)
   price = models.IntegerField()
   room_number = models.IntegerField()
+  imgs = models.TextField() 
   hotel = models.ForeignKey(hotel_model.Hotels,on_delete=models.CASCADE)
   class Meta:
     unique_together = ['hotel', 'room_number']
   @staticmethod
   def adding_rooms(rooms,hotel_id):
-    query = """INSERT INTO hotelrooms_hotelrooms (type,price,room_number,hotel_id)
-               VALUES (%s,%s,%s,%s);"""
+    query = """INSERT INTO hotelrooms_hotelrooms (type,price,room_number,hotel_id,imgs)
+               VALUES (%s,%s,%s,%s,%s);"""
     try:
       with transaction.atomic():
         with connection.cursor() as cursor:
@@ -39,7 +40,7 @@ class HotelRooms(models.Model):
         raise erros.DataBaseErrors.UpdatingRoomsError(f'There Seems to Be Some Kind of Error -->  /hotelrooms/models/updating_rooms {e}')
   @staticmethod
   def get_all_rooms(id):
-    query = """SELECT r.id,r.type,r.price,r.room_number
+    query = """SELECT r.id,r.type,r.price,r.room_number,r.imgs
                FROM hotelrooms_hotelrooms as r
                WHERE r.hotel_id = %s
                ORDER BY r.price ASC;"""
