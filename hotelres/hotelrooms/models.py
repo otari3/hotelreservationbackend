@@ -25,16 +25,15 @@ class HotelRooms(models.Model):
     except Exception as e:
       raise erros.DataBaseErrors.AddinRoomsError(f'There Seems to Be Some Kind of Error --> From adding_rooms {e}')
   @staticmethod
-  def update_rooms(rooms,hotel_id):
+  def update_rooms(room,hotel_id):
       query = """ 
       UPDATE hotelrooms_hotelrooms
-      SET type = %s,price = %s,room_number = %s
+      SET type = %s,price = %s,room_number = %s,imgs = %s
       WHERE id = %s AND hotel_id = %s;"""
       try:
         with transaction.atomic():
           with connection.cursor() as cursor:
-            for room in rooms['rooms']:
-              params = (room['type'],room['price'],room['room_number'],room['id'],hotel_id)
+              params = (room['type'],room['price'],room['room_number'],room['imgs'],room['id'],hotel_id)
               cursor.execute(query,params)
       except Exception as e:
         raise erros.DataBaseErrors.UpdatingRoomsError(f'There Seems to Be Some Kind of Error -->  /hotelrooms/models/updating_rooms {e}')
