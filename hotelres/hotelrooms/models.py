@@ -5,7 +5,7 @@ from hotels import models as hotel_model
 # Create your models here.
 
 class HotelRooms(models.Model):
-  type = models.TextField(max_length = 30)
+  type = models.TextField()
   price = models.IntegerField()
   room_number = models.IntegerField()
   imgs = models.TextField() 
