@@ -50,6 +50,14 @@ def delete_room(request,id):
       return erros.handel_errors(e,'hotelrooms/views/delete_room')
   else:
     return JsonResponse({'error':f'method should be DELETE'},status=405)
+def get_room_info(request):
+  if request.method =='GET':
+    try:
+      hotel_id = getattr(request,'hotel_id',None)
+      data = HotelRooms.get_room_info(hotel_id['hotel_id'])
+      return JsonResponse({'rooms':data},status=200)
+    except Exception as e:
+      return erros.handel_errors(e,'hotelroom/views/get_room_info')
     
     
   

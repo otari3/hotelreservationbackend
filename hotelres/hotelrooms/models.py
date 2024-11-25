@@ -13,14 +13,13 @@ class HotelRooms(models.Model):
   class Meta:
     unique_together = ['hotel', 'room_number']
   @staticmethod
-  def adding_rooms(rooms,hotel_id):
+  def adding_rooms(room,hotel_id):
     query = """INSERT INTO hotelrooms_hotelrooms (type,price,room_number,hotel_id,imgs)
                VALUES (%s,%s,%s,%s,%s);"""
     try:
       with transaction.atomic():
         with connection.cursor() as cursor:
-          for room in rooms['rooms']:
-            params = (room['type'],room['price'],room['room_number'],hotel_id)
+            params = (room['type'],room['price'],room['room_number'],hotel_id,room['imgs'])
             cursor.execute(query,params)
     except Exception as e:
       raise erros.DataBaseErrors.AddinRoomsError(f'There Seems to Be Some Kind of Error --> From adding_rooms {e}')
@@ -56,6 +55,22 @@ class HotelRooms(models.Model):
     try:
       base_model.Data_base_handeler.execute_query(query,(int(id),hotelid))
     except erros.DataBaseErrors.ExecuteQuery:
+      raise
+  @staticmethod
+  def get_room_info(hotel_id):
+    query = """
+            SELECT room_number,id,price
+            FROM hotelrooms_hotelrooms
+            WHERE hotel_id = %s
+    """
+    try:
+      with transaction.atomic():
+        with connection.cursor() as cursor:
+          cursor.execute(query,(hotel_id,))
+          data = cursor.fetchall()
+          formated_data = [{room[0]:{'room_number':room[0],'hotel':room[1],'price':room[2]}} for room in data]
+          return formated_data
+    except:
       raise
         
     
