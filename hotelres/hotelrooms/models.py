@@ -65,11 +65,7 @@ class HotelRooms(models.Model):
     """
     try:
       with transaction.atomic():
-        with connection.cursor() as cursor:
-          cursor.execute(query,(hotel_id,))
-          data = cursor.fetchall()
-          formated_data = [{room[0]:{'room_number':room[0],'hotel':room[1],'price':room[2]}} for room in data]
-          return formated_data
+          return base_model.Data_base_handeler.select_all(query,(hotel_id,))
     except:
       raise
         
