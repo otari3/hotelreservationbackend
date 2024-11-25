@@ -50,7 +50,6 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'authmiddle.middleware.LoginRequiredMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -61,6 +60,11 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'hotelres.urls'
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+
+CSRF_COOKIE_SAMESITE = 'Lax' 
+CSRF_COOKIE_SECURE = False      
+SESSION_COOKIE_SAMESITE = 'Lax' 
+SESSION_COOKIE_SECURE = False    
 
 TEMPLATES = [
     {

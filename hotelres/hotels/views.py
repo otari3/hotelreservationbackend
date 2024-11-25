@@ -3,7 +3,6 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from .models import Hotels
 from shared import erros
-from django.middleware.csrf import get_token
 
 
 # Create your views here.
@@ -33,8 +32,6 @@ def get_hotel(request):
       hotel_id = getattr(request,'hotel_id',None)
       hotel = Hotels.get_hotel(hotel_id['hotel_id'])
       response_succses = JsonResponse({'hotel':hotel[0]},status=200)
-      csrf_token = get_token(request)
-      response_succses.set_cookie('csrftoken', csrf_token, httponly=False, samesite='Lax')
       return response_succses
     except erros.DataBaseErrors.FormatingError as e:
       response = JsonResponse({'error':str(e),'from':'get_hotel'},status=400)
