@@ -59,13 +59,26 @@ class HotelRooms(models.Model):
   @staticmethod
   def get_room_info(hotel_id):
     query = """
-            SELECT room_number,id,price
-            FROM hotelrooms_hotelrooms
-            WHERE hotel_id = %s
+   WITH  table_expersion AS( 
+        SELECT r.room_id,generate_series( 
+          r.check_in::date,
+          r.check_out::date,
+          '1 day'::interval
+        )AS booked_dates
+        from reservation_reservation r
+        WHERE r.hotel_id = %s
+        )
+        SELECT room.room_number,room.price,room.id, 
+        array_agg(te.booked_dates::date) AS booked_dates
+        FROM hotelrooms_hotelrooms room
+        LEFT JOIN table_expersion te 
+        ON te.room_id=room.id
+        WHERE room.hotel_id = %s
+        GROUP BY room.room_number,room.price,room.id;
     """
     try:
       with transaction.atomic():
-          return base_model.Data_base_handeler.select_all(query,(hotel_id,))
+          return base_model.Data_base_handeler.select_all(query,(hotel_id,hotel_id))
     except:
       raise
         
