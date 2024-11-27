@@ -6,8 +6,8 @@ from hotels.models import Hotels
 # Create your models here.
 
 class User(models.Model):
-  name = models.TextField()
-  personal_id = models.TextField(db_index=True)
+  name = models.TextField(null=False)
+  personal_id = models.TextField(db_index=True,null=False)
   hotel = models.ForeignKey(Hotels,on_delete=models.CASCADE)
   class Meta:
     unique_together = ('hotel', 'personal_id')
