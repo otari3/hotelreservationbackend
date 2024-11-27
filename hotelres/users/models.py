@@ -14,6 +14,8 @@ class User(models.Model):
   
   @staticmethod
   def insert_user(user,hotel_id):
+    if not (user['name'] and user['personal_id']):
+      raise ValueError('there cant be empty values on users')
     query ="""WITH up as( 
             INSERT INTO users_user (name,personal_id,hotel_id)  
             VALUES (%s,%s,%s)
