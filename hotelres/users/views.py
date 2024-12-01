@@ -18,7 +18,8 @@ def insert_user(request):
       resvation = Reservation(check_in=data['check_in'],check_out=data['check_out'],user_id=user_id[0]['id'],  
                                 price=data['price'],in_hotel=False,nights=data['nights'], 
                                 hotel_id=hotel_id['hotel_id'],room_id=data['room_id'])
-      resvation.insert_reservation()
+      resvation.clean()
+      resvation.save()
       return JsonResponse({'user':user_id})
     except Exception as e:
       return erros.handel_errors(e,'/users/views/insert_user')

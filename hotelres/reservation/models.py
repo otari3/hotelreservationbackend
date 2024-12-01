@@ -5,6 +5,7 @@ from hotelrooms.models import HotelRooms
 from shared import models as handeler
 import json
 from psycopg2 import sql
+from django.db.models import Q
 
 
 # Create your models here.
@@ -23,19 +24,13 @@ class Reservation(models.Model):
     indexes = [
         models.Index(fields=['check_in', 'check_out','user','hotel','room'])
     ]
-
-  def insert_reservation(self):
-    query = """INSERT INTO reservation_reservation  
-               (check_in,check_out,user_id,price,in_hotel,nights,hotel_id,room_id)
-               VALUES (%s,%s,%s,%s,%s,%s,%s,%s);
-            """
-    try:
-      handeler.Data_base_handeler.execute_query(query,  
-                                              (self.check_in,self.check_out,self.user_id, 
-                                               self.price,self.in_hotel,self.nights,  
-                                               self.hotel_id,self.room_id))
-    except:
-      raise
+  def clean(self):
+    overlaping_reservation = Reservation.objects.filter (hotel=self.hotel,room=self.room 
+                                                        ).filter( Q(check_in__lt=self.check_out) &  
+                                                                 Q(check_out__gt=self.check_in))
+    if overlaping_reservation.exists():
+      raise ValueError('day in that room is arlady booked')
+  
   @staticmethod
   def searchin_reservation_info(where_query,haveing_query,hotel_id,params):
     where_clause = sql.SQL("AND {}").format(sql.SQL(where_query)) if where_query else sql.SQL("")
@@ -43,7 +38,7 @@ class Reservation(models.Model):
     query = """
               WITH order_reservation as (SELECT  
                       array_agg(r.id) AS reservation_ids,array_agg(rooms.room_number) AS rooms,  
-                      sum(r.nights*r.price) AS total, r.check_in,r.check_out,u.personal_id,u.name,
+                      sum(r.nights*r.price) AS total,r.check_in,r.check_out,u.personal_id,u.name,
                       ROW_NUMBER() OVER(ORDER BY r.check_in) as pagination_ids
                       FROM reservation_reservation r  
                       INNER JOIN hotelrooms_hotelrooms rooms ON r.room_id = rooms.id  
@@ -52,7 +47,7 @@ class Reservation(models.Model):
                       GROUP BY r.check_in,r.check_out,u.id
                       HAVING TRUE {haveing_clause})
               SELECT * FROM order_reservation 
-              LIMIT 100;
+              LIMIT 10;
               """.format(where_clause=where_clause.as_string(connection),  
                         haveing_clause=haveing_clause.as_string(connection))
     try:
@@ -91,22 +86,5 @@ class Reservation(models.Model):
       return serilazed_data
     except:
       raise
-  @staticmethod
-  def get_all_booked_dates(hotel_id):
-    query = """
-        WITH  table_expersion AS( 
-        SELECT room.room_number,generate_series( 
-          r.check_in::date,
-          r.check_out::date,
-          '1 day'::interval
-        )::date AS booked_dates
-        from reservation_reservation r 
-        INNER JOIN hotelrooms_hotelrooms room ON room.id = r.room_id 
-        WHERE r.hotel_id = %s
-        )
-        SELECT te.room_number,array_agg(te.booked_dates)
-        FROM table_expersion as te
-        GROUP BY te.room_number;
-    """
-    
+
         

@@ -64,7 +64,7 @@ class HotelRooms(models.Model):
           r.check_in::date,
           r.check_out::date,
           '1 day'::interval
-        ) AS booked_dates
+        )- interval '1 day' AS booked_dates
         from reservation_reservation r
         WHERE r.hotel_id = %s
         )
