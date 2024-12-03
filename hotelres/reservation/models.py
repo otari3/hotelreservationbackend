@@ -39,12 +39,13 @@ class Reservation(models.Model):
               WITH order_reservation as (SELECT  
                       array_agg(r.id) AS reservation_ids,array_agg(rooms.room_number) AS rooms,  
                       sum(r.nights*r.price) AS total,r.check_in,r.check_out,u.personal_id,u.name,
-                      ROW_NUMBER() OVER(ORDER BY r.check_in) as pagination_ids
+                      ROW_NUMBER() OVER(ORDER BY r.check_in) as pagination_ids,
+                      r.in_hotel
                       FROM reservation_reservation r  
                       INNER JOIN hotelrooms_hotelrooms rooms ON r.room_id = rooms.id  
                       INNER JOIN users_user u ON r.user_id = u.id
                       WHERE r.hotel_id= %s {where_clause}
-                      GROUP BY r.check_in,r.check_out,u.id
+                      GROUP BY r.check_in,r.check_out,u.id,r.in_hotel
                       HAVING TRUE {haveing_clause})
               SELECT * FROM order_reservation 
               LIMIT 10;
