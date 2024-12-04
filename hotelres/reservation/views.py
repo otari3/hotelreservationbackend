@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from shared import erros
 from django.views.decorators.csrf import csrf_exempt
 from .models  import Reservation
+import json
 @csrf_exempt
 def get_avalible_rooms(request):
   if request.method == 'GET':
@@ -10,6 +11,7 @@ def get_avalible_rooms(request):
       return JsonResponse({'rooms':Reservation.get_avalible_rooms(hotel_id['hotel_id'])},status=200)
     except Exception as e:
        erros.handel_errors(e,'/resrevation/views/get_avalible_rooms')
+
 
 def get_filtered_rooms(request):
   if request.method == 'GET':
@@ -21,6 +23,7 @@ def get_filtered_rooms(request):
       check_out = request.GET.get('check_out')
       search = request.GET.get('search')
       reservation_id = request.GET.get('id')
+      in_hotel = request.GET.get('in_hotel')
       dynamic_query_having = []
       dynamic_query_where = []
       params = []
@@ -40,6 +43,10 @@ def get_filtered_rooms(request):
         dynamic_query_where.append("(u.name LIKE %s OR u.personal_id LIKE %s)")
         params.append(f"%{search}%")
         params.append(f"%{search}%")
+      if in_hotel:
+        dynamic_query_where.append("r.in_hotel")
+      else:
+        dynamic_query_where.append("NOT r.in_hotel")
     ##HAVING 
       if to_price:
         dynamic_query_having.append("sum(r.nights*r.price) <= %s")
@@ -53,3 +60,11 @@ def get_filtered_rooms(request):
       return JsonResponse({'data':data},status=200)
     except Exception as e:
       return erros.handel_errors(e,'/resrevation/views/get_filtered_rooms')
+@csrf_exempt    
+def get_specific_rooms(request):
+    try:
+      hotel_id = getattr(request,'hotel_id',None)
+      reservation_ids = json.loads(request.body)
+      return JsonResponse({'data':Reservation.get_specific_rooms(hotel_id['hotel_id'],reservation_ids['id'])})
+    except Exception as e:
+      return erros.handel_errors(e,'error/from/get_specific_rooms')

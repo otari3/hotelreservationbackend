@@ -87,5 +87,20 @@ class Reservation(models.Model):
       return serilazed_data
     except:
       raise
+  @staticmethod
+  def get_specific_rooms(hotel_id,reservation_id):
+    try:
+      query=""" 
+        SELECT r.id,r.price,r.in_hotel,r.nights,room.room_number
+        FROM reservation_reservation r
+        INNER JOIN hotelrooms_hotelrooms room
+        ON room.id = r.room_id
+        WHERE r.hotel_id = %s AND r.id IN %s
+        """
+      data = handeler.Data_base_handeler.select_all(query,(hotel_id,tuple(reservation_id)))
+      return data
+    except:
+      raise
+    
 
         
