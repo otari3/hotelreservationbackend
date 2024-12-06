@@ -101,6 +101,10 @@ class Reservation(models.Model):
       return data
     except:
       raise
+  @staticmethod
+  def update_in_hotel(id,hotel_id):
+    Reservation.objects.filter(id=id,hotel_id=hotel_id).update(in_hotel=True)
+    
     
 
         

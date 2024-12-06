@@ -65,6 +65,6 @@ def get_specific_rooms(request):
     try:
       hotel_id = getattr(request,'hotel_id',None)
       reservation_ids = json.loads(request.body)
-      return JsonResponse({'data':Reservation.get_specific_rooms(hotel_id['hotel_id'],reservation_ids['id'])})
+      return JsonResponse({'data':Reservation.get_specific_rooms(hotel_id['hotel_id'],reservation_ids['id'])},status=200)
     except Exception as e:
       return erros.handel_errors(e,'error/from/get_specific_rooms')
