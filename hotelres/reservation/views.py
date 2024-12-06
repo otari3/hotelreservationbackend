@@ -68,3 +68,11 @@ def get_specific_rooms(request):
       return JsonResponse({'data':Reservation.get_specific_rooms(hotel_id['hotel_id'],reservation_ids['id'])},status=200)
     except Exception as e:
       return erros.handel_errors(e,'error/from/get_specific_rooms')
+@csrf_exempt
+def move_to_hotel(request,id):
+  try:
+     hotel_id = getattr(request,'hotel_id',None)
+     Reservation.update_in_hotel(id,hotel_id['hotel_id'])
+     return JsonResponse({'message':'in_hotel changed'},status=200)
+  except Exception as e:
+    return erros.handel_errors(e,'error/from/move_to_hotel')
