@@ -32,9 +32,10 @@ class Reservation(models.Model):
       raise ValueError('day in that room is arlady booked')
   
   @staticmethod
-  def searchin_reservation_info(where_query,haveing_query,hotel_id,params):
+  def searchin_reservation_info(where_query,haveing_query,hotel_id,params,pagination):
     where_clause = sql.SQL("AND {}").format(sql.SQL(where_query)) if where_query else sql.SQL("")
     haveing_clause = sql.SQL("AND {}").format(sql.SQL(haveing_query)) if haveing_query else sql.SQL("")
+    pagination_where = sql.SQL("AND {}").format(sql.SQL(pagination[0])) if pagination else sql.SQL("")
     query = """
               WITH order_reservation as (SELECT  
                       array_agg(r.id) AS reservation_ids,array_agg(rooms.room_number) AS rooms,  
@@ -48,9 +49,11 @@ class Reservation(models.Model):
                       GROUP BY r.check_in,r.check_out,u.id,r.in_hotel
                       HAVING TRUE {haveing_clause})
               SELECT * FROM order_reservation 
+              WHERE TRUE {pagination}
               LIMIT 10;
               """.format(where_clause=where_clause.as_string(connection),  
-                        haveing_clause=haveing_clause.as_string(connection))
+                        haveing_clause=haveing_clause.as_string(connection),
+                        pagination=pagination_where.as_string(connection))
     try:
      with connection.cursor() as cursor:
        cursor.execute(query,[hotel_id,*params])
@@ -104,6 +107,26 @@ class Reservation(models.Model):
   @staticmethod
   def update_in_hotel(id,hotel_id):
     Reservation.objects.filter(id=id,hotel_id=hotel_id).update(in_hotel=True)
+  @staticmethod
+  def move_to_report(id,hotel_id):
+    query = """ 
+      DELETE FROM reservation_reservation r
+      USING hotelrooms_hotelrooms room,users_user u 
+      WHERE r.room_id = room.id
+            AND r.user_id = u.id
+            AND r.hotel_id = %s
+            AND r.id = %s
+      RETURNING r.check_in,r.check_out,u.name,u.personal_id,r.price,r.nights,r.hotel_id,room.room_number  
+"""
+    try:
+      with transaction.atomic():
+        with connection.cursor() as cursor:
+          params = (hotel_id,id)
+          cursor.execute(query,params)
+          data = cursor.fetchone()
+          return data
+    except:
+      raise
     
     
 
