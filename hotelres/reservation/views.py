@@ -90,4 +90,12 @@ def move_to_report(request,id):
     return JsonResponse({'message':'hotel moved to reports'},status=200)
   except Exception as e:
     return erros.handel_errors(e,'error/from/move_to_report')
+@csrf_exempt
+def delete_from_reservation(request,id):
+   try:
+      hotel_id = getattr(request,'hotel_id',None)
+      Reservation.delete_from_reservation(hotel_id['hotel_id'],id)
+      return JsonResponse({'succses':'deleted'},status=200)
+   except:
+     return JsonResponse({'error':'cant delete some kind of error'},status=400)
     

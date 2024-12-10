@@ -127,6 +127,9 @@ class Reservation(models.Model):
           return data
     except:
       raise
+  @staticmethod
+  def delete_from_reservation(hotel_id,id):
+    Reservation.objects.filter(hotel=hotel_id,id=id).delete()
     
     
 
