@@ -23,4 +23,5 @@ urlpatterns = [
     path('',include('hotelrooms.urls')),
     path('',include('users.urls')),
     path('',include('reservation.urls')),
+    path('',include('report.urls')),
 ]

@@ -12,5 +12,6 @@ class Report(models.Model):
   room_number = models.TextField()
   @staticmethod
   def get_report(check_out,hotel_id):
-    data = Report.objects.filter(check_out=check_out,  hotel=hotel_id)
+    data = Report.objects.filter(check_out=check_out,  hotel=hotel_id).values()
+    return data
     

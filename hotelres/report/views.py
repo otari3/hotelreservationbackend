@@ -1,3 +1,8 @@
-from django.shortcuts import render
+from django.http import JsonResponse
+from shared import erros
+from .models import Report
 
-# Create your views here.
+def getting_report(request,date):
+  hotel_id = getattr(request,'hotel_id',None)
+  data = Report.get_report(date,hotel_id['hotel_id'])
+  return JsonResponse({'data':list(data)},status =200)
