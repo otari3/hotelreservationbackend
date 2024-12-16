@@ -45,7 +45,7 @@ class Reservation(models.Model):
                       FROM reservation_reservation r  
                       INNER JOIN hotelrooms_hotelrooms rooms ON r.room_id = rooms.id  
                       INNER JOIN users_user u ON r.user_id = u.id
-                      WHERE r.hotel_id= %s {where_clause}
+                      WHERE r.hotel_id= %s {where_clause} 
                       GROUP BY r.check_in,r.check_out,u.id,r.in_hotel
                       HAVING TRUE {haveing_clause})
               SELECT * FROM order_reservation 
