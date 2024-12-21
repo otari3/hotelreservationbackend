@@ -92,13 +92,14 @@ WSGI_APPLICATION = 'hotelres.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'hotelreservation',
+        'NAME': 'hotelreservation_6gg3',
         'USER': 'otikonozadze',
-        'PASSWORD': 'yourpassword',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'PASSWORD': 'SLWuhZiGVQwDb4mtYnWP4qGrI55mYKjp',
+        'HOST': 'dpg-ctjcc0lds78s73eopct0-a.frankfurt-postgres.render.com',
+        'PORT': 5432,  # Port is a number, not a string
     }
 }
+
 
 
 # Password validation
