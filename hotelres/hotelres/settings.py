@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-ruy9lr_kf)spl23ltkig_)(s5)pv0^zqd6#@(+$%2wu#k@z-l%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -100,7 +100,7 @@ DATABASES = {
         'PORT': 5432,  # Port is a number, not a string
     }
 }
-
+ALLOWED_HOSTS = ['*']
 
 
 # Password validation
