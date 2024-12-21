@@ -28,7 +28,6 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -100,7 +99,6 @@ DATABASES = {
         'PORT': 5432,  # Port is a number, not a string
     }
 }
-ALLOWED_HOSTS = ['*']
 
 
 # Password validation
